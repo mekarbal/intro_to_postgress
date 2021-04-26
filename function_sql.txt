@@ -1,0 +1,84 @@
+
+CREATE OR REPLACE FUNCTION percetage(total INT) RETURNS INTEGER AS $$
+DECLARE
+n INTEGER;
+pe NUMERIC;
+BEGIN
+SELECT COUNT(*) INTO n FROM youcoders where campus='Youssoufia' and classe = 'FEBE';
+
+pe = (total * n)/100;
+
+return pe;
+
+END
+$$ LANGUAGE plpgsql;
+
+
+select percetage(200)
+
+
+///////////////////////////
+CREATE OR REPLACE FUNCTION stSameRef(student VARCHAR) RETURNS INTEGER AS $$
+DECLARE
+sClasse VARCHAR;
+n INTEGER;
+
+BEGIN
+SELECT classe INTO sClasse FROM youcoders where full_name=student;
+
+SELECT COUNT(*) INTO n FROM youcoders where classe=sClasse;
+
+
+
+
+return n;
+
+END
+$$ LANGUAGE plpgsql;
+
+
+select stSameRef('Omar omar')
+
+//////////////:
+
+
+CREATE OR REPLACE PROCEDURE changeStatus()
+LANGUAGE SQL
+AS $$
+UPDATE youcoders
+SET is_accepted  = true
+WHERE campus  = 'Youssoufia'
+$$;
+
+CALL changeStatus()
+
+select * from youcoders
+
+
+
+/////////////////////
+
+CREATE OR REPLACE PROCEDURE updateClasse()
+LANGUAGE SQL
+AS $$
+UPDATE youcoders
+SET classe  = 'DATA BI'
+WHERE nbr_competence=14 AND matricule LIKE '%2%'
+$$;
+
+CALL updateClasse()
+
+select * from youcoders
+
+
+
+CREATE OR REPLACE FUNCTION emp_stamp() RETURNS trigger AS $emp_stamp$
+    BEGIN
+       UPDATE youcoders SET is_accepted = false;
+       RETURN NEW;
+    END;
+$emp_stamp$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER emp_stamp AFTER INSERT  ON youcoders
+    FOR EACH ROW EXECUTE FUNCTION emp_stamp();
